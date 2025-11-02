@@ -31,8 +31,9 @@
 
 package com.aerosimo.ominet.api.rest;
 
-import com.aerosimo.ominet.dao.impl.ApiResponseDTO;
+import com.aerosimo.ominet.dao.impl.APIResponseDTO;
 import com.aerosimo.ominet.dao.impl.RegisterRequestDTO;
+import com.aerosimo.ominet.dao.impl.VerifyRequestDTO;
 import com.aerosimo.ominet.dao.mapper.AuthDAO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -55,19 +56,36 @@ public class AuthREST {
         log.info("User account creation is {}", result);
         switch (result.toUpperCase()) {
             case "SUCCESS":
-            return Response.ok(new ApiResponseDTO("success")).build();
+            return Response.ok(new APIResponseDTO("success")).build();
             case "EMAIL_EXISTS":
             return Response.status(Response.Status.CONFLICT)
-                    .entity(new ApiResponseDTO("email already registered"))
+                    .entity(new APIResponseDTO("email already registered"))
                     .build();
             case "PASSWORD_ERROR":
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ApiResponseDTO("invalid password"))
+                    .entity(new APIResponseDTO("invalid password"))
                     .build();
             default:
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new ApiResponseDTO(result))
+                        .entity(new APIResponseDTO(result))
                         .build();
+        }
+    }
+
+    @POST
+    @Path("/verify")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response verify(VerifyRequestDTO req) {
+        log.info("Preparing to verify user email...");
+        String result = AuthDAO.verifyEmail(req.token);
+        log.info("User email verification is {}", result);
+        if (result.toUpperCase().equals("SUCCESS")) {
+            return Response.ok(new APIResponseDTO("success")).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new APIResponseDTO("unsuccessful"))
+                    .build();
         }
     }
 }

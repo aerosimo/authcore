@@ -2,9 +2,9 @@
  * This piece of work is to enhance authcore project functionality.           *
  *                                                                            *
  * Author:    eomisore                                                        *
- * File:      APIResponseDTO.java                                             *
- * Created:   01/11/2025, 15:56                                               *
- * Modified:  01/11/2025, 15:56                                               *
+ * File:      MailSession.java                                                *
+ * Created:   01/11/2025, 16:30                                               *
+ * Modified:  01/11/2025, 16:30                                               *
  *                                                                            *
  * Copyright (c)  2025.  Aerosimo Ltd                                         *
  *                                                                            *
@@ -29,24 +29,40 @@
  *                                                                            *
  ******************************************************************************/
 
-package com.aerosimo.ominet.dao.impl;
+package com.aerosimo.ominet.core.config;
 
-public class APIResponseDTO {
+import jakarta.mail.Session;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-    private String status;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 
-    public APIResponseDTO() {
-    }
+public class MailSession {
 
-    public APIResponseDTO(String status) {
-        this.status = status;
-    }
+    private static final Logger log = LogManager.getLogger(MailSession.class);
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    /**
+     * Returns a JavaMail Session from JNDI ("mail/aerosimo").
+     * Each call does a fresh lookup to avoid stale references.
+     *
+     * @return Jakarta Mail Session or null if lookup fails
+     */
+    public static Session email() {
+        log.info("Preparing to get email session from JNDI");
+        try {
+            Context ctx = new InitialContext();
+            try {
+                Context env = (Context) ctx.lookup("java:/comp/env");
+                Session sess = (Session) env.lookup("mail/aerosimo");
+                log.debug("Successfully retrieved mail session via JNDI");
+                return sess;
+            } finally {
+                ctx.close(); // prevent context leak
+            }
+        } catch (Exception err) {
+            log.error("Email session lookup failed in {}", Connect.class.getName(), err);
+            return null;
+        }
     }
 }

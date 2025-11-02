@@ -31,11 +31,9 @@
 
 package com.aerosimo.ominet.core.config;
 
-import jakarta.mail.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -48,34 +46,6 @@ import java.sql.SQLException;
 public class Connect {
 
     private static final Logger log = LogManager.getLogger(Connect.class);
-
-    private Connect() {
-        // utility class, no instantiation
-    }
-
-    /**
-     * Returns a JavaMail Session from JNDI ("mail/aerosimo").
-     * Each call does a fresh lookup to avoid stale references.
-     *
-     * @return Jakarta Mail Session or null if lookup fails
-     */
-    public static Session email() {
-        log.info("Preparing to get email session from JNDI");
-        try {
-            Context ctx = new InitialContext();
-            try {
-                Context env = (Context) ctx.lookup("java:/comp/env");
-                Session sess = (Session) env.lookup("mail/aerosimo");
-                log.debug("Successfully retrieved mail session via JNDI");
-                return sess;
-            } finally {
-                ctx.close(); // prevent context leak
-            }
-        } catch (Exception err) {
-            log.error("Email session lookup failed in {}", Connect.class.getName(), err);
-            return null;
-        }
-    }
 
     /**
      * Returns a connection via JDBC Data Sources from JNDI ("jdbc/hats").

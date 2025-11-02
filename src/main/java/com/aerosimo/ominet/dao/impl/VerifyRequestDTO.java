@@ -2,9 +2,9 @@
  * This piece of work is to enhance authcore project functionality.           *
  *                                                                            *
  * Author:    eomisore                                                        *
- * File:      APIResponseDTO.java                                             *
- * Created:   01/11/2025, 15:56                                               *
- * Modified:  01/11/2025, 15:56                                               *
+ * File:      VerifyRequestDTO.java                                           *
+ * Created:   02/11/2025, 21:06                                               *
+ * Modified:  02/11/2025, 21:06                                               *
  *                                                                            *
  * Copyright (c)  2025.  Aerosimo Ltd                                         *
  *                                                                            *
@@ -31,22 +31,29 @@
 
 package com.aerosimo.ominet.dao.impl;
 
-public class APIResponseDTO {
+public class VerifyRequestDTO {
 
-    private String status;
+    public String token;
 
-    public APIResponseDTO() {
+    public VerifyRequestDTO() {
     }
 
-    public APIResponseDTO(String status) {
-        this.status = status;
+    public VerifyRequestDTO(String token) {
+        this.token = token;
     }
 
-    public String getStatus() {
-        return status;
+    public String getToken() {
+        return token;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Override
+    public String toString() {
+        return "VerifyRequestDTO{" +
+                "token='" + token + '\'' +
+                '}';
     }
 }
