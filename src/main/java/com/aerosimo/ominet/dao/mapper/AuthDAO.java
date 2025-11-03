@@ -101,18 +101,19 @@ public class AuthDAO {
     public static String userLogin(String username, String password) {
         log.info("Preparing to login user");
         String response = "unsuccessful";
-        String sql = "{call authentication_pkg.userLogin(?,?,?,?)}";
+        String sql = "{call authentication_pkg.userLogin(?,?,?,?,?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.setString(1, username);
             stmt.setString(2, password);
             stmt.registerOutParameter(3, OracleTypes.VARCHAR);
             stmt.registerOutParameter(4, OracleTypes.VARCHAR);
+            stmt.registerOutParameter(5, OracleTypes.VARCHAR);
             stmt.execute();
-            response = stmt.getString(4);
+            response = stmt.getString(5);
             log.info("Successfully login user with following response: {}", response);
             if(response.equalsIgnoreCase("SUCCESS")){
-                AuthenticationEmail.sendMail(username, stmt.getString(3));
+                AuthenticationEmail.sendMail(username, stmt.getString(3),stmt.getString(4));
             }
         } catch (SQLException err) {
             log.error("Error in authentication_pkg (LOGIN)", err);

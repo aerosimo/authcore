@@ -39,8 +39,8 @@ public class AuthenticationEmail {
 
     private static final Logger log = LogManager.getLogger(AuthenticationEmail.class.getName());
 
-    public static String sendMail(String username, String email) {
-        log.info("Sending email to {} with token {}", email, token);
+    public static String sendMail(String username, String email, String authkey) {
+        log.info("Sending email to {} with token {}", email, authkey);
         String response;
         StringBuilder memo;
         try {
@@ -130,7 +130,7 @@ public class AuthenticationEmail {
                     "      <p>Please use the following authentication key to complete your login process.</p>\n" +
                     "      <div class=\"token-box\">\n" +
                     "        <div class=\"token\">");
-            memo.append(token);
+            memo.append(authkey);
             memo.append("</div>\n" +
                     "      </div>\n" +
                     "      <p class=\"expiry\">This token is valid for <strong>2 hours</strong>.</p>\n" +
