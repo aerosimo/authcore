@@ -61,7 +61,7 @@ public class AuthDAO {
             response = stmt.getString(5);
             log.info("Successfully create user account with following response: {}", response);
             if(response.equalsIgnoreCase("SUCCESS")){
-                WelcomeEmail.sendMail(username, email, stmt.getString(4));
+                WelcomeEmail.sendMail(username, email, stmt.getString(5));
             }
         } catch (SQLException err) {
             log.error("Error in authentication_pkg (CREATE ACCOUNT)", err);
