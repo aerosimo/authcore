@@ -31,9 +31,7 @@
 
 package com.aerosimo.ominet.api.rest;
 
-import com.aerosimo.ominet.dao.impl.APIResponseDTO;
-import com.aerosimo.ominet.dao.impl.RegisterRequestDTO;
-import com.aerosimo.ominet.dao.impl.VerifyRequestDTO;
+import com.aerosimo.ominet.dao.impl.*;
 import com.aerosimo.ominet.dao.mapper.AuthDAO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -52,7 +50,7 @@ public class AuthREST {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(RegisterRequestDTO req) {
         log.info("Preparing to create user account...");
-        String result = AuthDAO.createAccount(req.username, req.email, req.password);
+        String result = AuthDAO.registerUser(req.username, req.email, req.password);
         log.info("User account creation is {}", result);
         switch (result.toUpperCase()) {
             case "SUCCESS":
@@ -80,11 +78,62 @@ public class AuthREST {
         log.info("Preparing to verify user email...");
         String result = AuthDAO.verifyEmail(req.token);
         log.info("User email verification is {}", result);
-        if (result.toUpperCase().equals("SUCCESS")) {
+        if (result.equalsIgnoreCase("success")) {
             return Response.ok(new APIResponseDTO("success")).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new APIResponseDTO("unsuccessful"))
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/login")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response login(LoginRequestDTO req) {
+        log.info("Preparing to login user...");
+        String result = AuthDAO.userLogin(req.username, req.password);
+        log.info("User login is {}", result);
+        if (result.equalsIgnoreCase("success")) {
+            return Response.ok(new APIResponseDTO("success")).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new APIResponseDTO("unsuccessful"))
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/validate")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response validate(ValidateRequestDTO req) {
+        log.info("Preparing to validate authentication key...");
+        String result = AuthDAO.validateAuthKey(req.authKey);
+        log.info("authentication key is {}", result);
+        if (result.equalsIgnoreCase("valid")) {
+            return Response.ok(new APIResponseDTO("valid")).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new APIResponseDTO("invalid"))
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/logout")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response logout(ValidateRequestDTO req) {
+        log.info("Preparing to logout user...");
+        String result = AuthDAO.userLogout(req.authKey);
+        log.info("User is now logged out with the following {}", result);
+        if (result.equalsIgnoreCase("success")) {
+            return Response.ok(new APIResponseDTO("success")).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new APIResponseDTO("invalid credentials"))
                     .build();
         }
     }
