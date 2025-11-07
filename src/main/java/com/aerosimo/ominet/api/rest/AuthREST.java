@@ -125,7 +125,7 @@ public class AuthREST {
     @Path("/logout")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response logout(ValidateRequestDTO req) {
+    public Response logout(LogoutRequestDTO req) {
         log.info("Preparing to logout user...");
         String result = AuthDAO.userLogout(req.authKey);
         log.info("User is now logged out with the following {}", result);
