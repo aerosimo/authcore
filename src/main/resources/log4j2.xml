@@ -30,70 +30,34 @@
   ~                                                                           ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<Configuration status="WARN" monitorInterval="60">
-
+<Configuration status="TRACE">
     <!-- ========= Properties ========= -->
     <Properties>
-        <property name="baseLogDir">/opt/logs</property>
+        <property name="baseLogDir">/opt/logs/authcore</property>
         <property name="fileyear">${date:yyyy}</property>
         <property name="filemonth">${date:MMMM}</property>
         <property name="fileday">${date:ddMMyyyy}</property>
-        <!-- Optional: fallback to user.home if /opt/logs is not writable -->
-        <property name="fallbackDir">${sys:user.home}/confluxLogs</property>
     </Properties>
-
     <!-- ========= Appenders ========= -->
     <Appenders>
-
-        <!-- 🧾 Rolling File Appender -->
-        <RollingFile name="FileAppender"
-                     fileName="${baseLogDir}/${fileyear}/${filemonth}/${fileday}.log"
-                     filePattern="${baseLogDir}/${fileyear}/${filemonth}/${fileday}-%d{dd-MMMM-yyyy}-%i.log.gz"
-                     createOnDemand="true">
+        <RollingFile name="LogToRollingFile" fileName="${baseLogDir}/${fileyear}/${filemonth}/${fileday}.log"
+                     filePattern="${baseLogDir}/${fileyear}/${filemonth}/${fileday}-%d{dd-MMMM-yyyy}-%i.log.gz">
             <PatternLayout>
-                <Pattern>[%-5level] %d{EEE dd-MM-yyyy HH:mm:ss.SSS} [%t] %c{1} - %msg%n</Pattern>
+                <pattern>[%-5level] %d{EEE dd-MM-yyyy HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
             </PatternLayout>
             <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="10MB"/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="10MB" />
             </Policies>
         </RollingFile>
-
-        <!-- 🪶 Fallback Rolling File (when /opt/logs is not writable) -->
-        <RollingFile name="FallbackFileAppender"
-                     fileName="${fallbackDir}/${fileyear}/${filemonth}/${fileday}.log"
-                     filePattern="${fallbackDir}/${fileyear}/${filemonth}/${fileday}-%d{dd-MMMM-yyyy}-%i.log.gz"
-                     createOnDemand="true">
-            <PatternLayout>
-                <Pattern>[%-5level] %d{EEE dd-MM-yyyy HH:mm:ss.SSS} [%t] %c{1} - %msg%n</Pattern>
-            </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="10MB"/>
-            </Policies>
-        </RollingFile>
-
-        <!-- 🖥 Console Appender -->
-        <Console name="ConsoleAppender" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%-5level] %d{HH:mm:ss} [%t] %c{1} - %msg%n"/>
-        </Console>
-
     </Appenders>
-
     <!-- ========= Loggers ========= -->
     <Loggers>
-        <!-- Application Logs -->
-        <Logger name="com.aerosimo" level="debug" additivity="false">
-            <AppenderRef ref="FileAppender"/>
-            <AppenderRef ref="FallbackFileAppender"/>
-            <AppenderRef ref="ConsoleAppender"/>
+        <Logger name="com.aerosimo" level="trace" additivity="false">
+            <AppenderRef ref="LogToRollingFile"/>
         </Logger>
-
-        <!-- Root Logger -->
-        <Root level="info">
-            <AppenderRef ref="FileAppender"/>
-            <AppenderRef ref="FallbackFileAppender"/>
-            <AppenderRef ref="ConsoleAppender"/>
+        <Root level="trace" additivity="false">
+            <AppenderRef ref="LogToRollingFile"/>
         </Root>
     </Loggers>
 </Configuration>

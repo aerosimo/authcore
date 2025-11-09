@@ -33,6 +33,7 @@ package com.aerosimo.ominet.dao.mapper;
 
 import com.aerosimo.ominet.core.config.Connect;
 import com.aerosimo.ominet.core.model.Spectre;
+import com.aerosimo.ominet.dao.impl.APIResponseDTO;
 import com.aerosimo.ominet.mail.AuthenticationEmail;
 import com.aerosimo.ominet.mail.WelcomeEmail;
 import oracle.jdbc.OracleTypes;
@@ -47,8 +48,9 @@ public class AuthDAO {
 
     private static final Logger log = LogManager.getLogger(AuthDAO.class.getName());
 
-    public static String registerUser(String username, String email, String password) {
+    public static APIResponseDTO registerUser(String username, String email, String password) {
         log.info("Preparing to create user account");
+        String result;
         String response;
         String sql = "{call authentication_pkg.registerUser(?,?,?,?,?)}";
         try (Connection con = Connect.dbase();
@@ -59,26 +61,29 @@ public class AuthDAO {
             stmt.registerOutParameter(4, OracleTypes.VARCHAR);
             stmt.registerOutParameter(5, OracleTypes.VARCHAR);
             stmt.execute();
+            result = stmt.getString(4);
             response = stmt.getString(5);
             log.info("Successfully create user account with following response: {}", response);
             if(response.equalsIgnoreCase("SUCCESS")){
-                WelcomeEmail.sendMail(username, email, stmt.getString(4));
+                WelcomeEmail.sendMail(username, email, result);
+                return new APIResponseDTO(response,result);
+            } else {
+                return new APIResponseDTO("unsuccessful", "");
             }
         } catch (SQLException err) {
             log.error("Error in authentication_pkg (CREATE ACCOUNT)", err);
             try {
                 Spectre.recordError("TE-20001", "Error in authentication_pkg (CREATE ACCOUNT): " + err.getMessage(), AuthDAO.class.getName());
+                return new APIResponseDTO("error", "internal server error");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            response = String.format("Create Account error %s", err.getMessage());
         }
-        return response;
     }
 
     public static String verifyEmail(String verificationToken) {
         log.info("Preparing to verify new user email");
-        String response = "unsuccessful";
+        String response;
         String sql = "{call authentication_pkg.verifyEmail(?,?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -91,6 +96,7 @@ public class AuthDAO {
             log.error("Error in authentication_pkg (VERIFY EMAIL)", err);
             try {
                 Spectre.recordError("TE-20001", "Error in authentication_pkg (VERIFY EMAIL): " + err.getMessage(), AuthDAO.class.getName());
+                response = "internal server error";
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -98,9 +104,11 @@ public class AuthDAO {
         return response;
     }
 
-    public static String userLogin(String username, String password) {
+    public static APIResponseDTO userLogin(String username, String password) {
         log.info("Preparing to login user");
-        String response = "unsuccessful";
+        String email;
+        String authKey;
+        String response;
         String sql = "{call authentication_pkg.userLogin(?,?,?,?,?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -110,25 +118,30 @@ public class AuthDAO {
             stmt.registerOutParameter(4, OracleTypes.VARCHAR);
             stmt.registerOutParameter(5, OracleTypes.VARCHAR);
             stmt.execute();
+            email = stmt.getString(3);
+            authKey = stmt.getString(4);
             response = stmt.getString(5);
             log.info("Successfully login user with following response: {}", response);
             if(response.equalsIgnoreCase("SUCCESS")){
-                AuthenticationEmail.sendMail(username, stmt.getString(3),stmt.getString(4));
+                AuthenticationEmail.sendMail(username,email,authKey);
+                return new APIResponseDTO(response,authKey);
+            } else {
+                return new APIResponseDTO("unsuccessful", "");
             }
         } catch (SQLException err) {
             log.error("Error in authentication_pkg (LOGIN)", err);
             try {
                 Spectre.recordError("TE-20001", "Error in authentication_pkg (LOGIN): " + err.getMessage(), AuthDAO.class.getName());
+                return new APIResponseDTO("error", "internal server error");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        return response;
     }
 
     public static String validateAuthKey(String authKey) {
         log.info("Preparing to validate authentication key");
-        String response = "invalid";
+        String response;
         String sql = "{call authentication_pkg.validateAuthKey(?,?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -141,6 +154,7 @@ public class AuthDAO {
             log.error("Error in authentication_pkg (VALIDATE AUTHKEY)", err);
             try {
                 Spectre.recordError("TE-20001", "Error in authentication_pkg (VALIDATE AUTHKEY): " + err.getMessage(), AuthDAO.class.getName());
+                response = "internal server error";
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -150,7 +164,7 @@ public class AuthDAO {
 
     public static String userLogout(String authKey) {
         log.info("Preparing to logout user");
-        String response = "invalid credentials";
+        String response;
         String sql = "{call authentication_pkg.userLogout(?,?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -163,6 +177,7 @@ public class AuthDAO {
             log.error("Error in authentication_pkg (LOGOUT)", err);
             try {
                 Spectre.recordError("TE-20001", "Error in authentication_pkg (LOGOUT): " + err.getMessage(), AuthDAO.class.getName());
+                response = "internal server error";
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

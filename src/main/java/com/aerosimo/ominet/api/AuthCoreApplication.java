@@ -3,8 +3,8 @@
  *                                                                            *
  * Author:    eomisore                                                        *
  * File:      AuthCoreApplication.java                                        *
- * Created:   01/11/2025, 14:04                                               *
- * Modified:  01/11/2025, 14:04                                               *
+ * Created:   01/11/2025, 14:05                                               *
+ * Modified:  09/11/2025, 19:30                                               *
  *                                                                            *
  * Copyright (c)  2025.  Aerosimo Ltd                                         *
  *                                                                            *
@@ -29,7 +29,7 @@
  *                                                                            *
  ******************************************************************************/
 
-package com.aerosimo.ominet.api.rest;
+package com.aerosimo.ominet.api;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;

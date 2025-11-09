@@ -31,75 +31,82 @@
 
 package com.aerosimo.ominet.core.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility for sending email via Postmaster REST service.
+ */
 public class Postmaster {
 
-    private static final Logger log = LogManager.getLogger(Postmaster.class.getName());
-
-    // REST endpoint instead of SOAP
-    private static final String ENDPOINT_URL = "http://ominet.aerosimo.com:8081/postmaster/api/sendemail";
-
+    private static final Logger log = LogManager.getLogger(Postmaster.class);
+    private static final String ENDPOINT_URL = "https://ominet.aerosimo.com:9443/postmaster/api/sendemail";
     private static final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Send an email via Postmaster REST service
+     * Sends an email using Postmaster REST API.
+     *
+     * @param emailAddress recipient address
+     * @param emailSubject subject line
+     * @param emailMessage message body
+     * @param emailFiles   optional attachments (as string reference)
+     * @return status message from Postmaster
      */
     public static String sendEmail(String emailAddress, String emailSubject, String emailMessage, String emailFiles) {
-        String response = "Message sent successfully";
-
         try {
-            // Build JSON request body
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("emailAddress", emailAddress);
-            payload.put("emailSubject", emailSubject);
-            payload.put("emailMessage", emailMessage);
-            payload.put("emailFiles", emailFiles);
+            Map<String, Object> payload = Map.of(
+                    "emailAddress", emailAddress,
+                    "emailSubject", emailSubject,
+                    "emailMessage", emailMessage,
+                    "emailFiles", emailFiles);
 
             String jsonRequest = mapper.writeValueAsString(payload);
 
-            // Open HTTP connection
-            URL url = new URL(ENDPOINT_URL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL(ENDPOINT_URL).openConnection();
             conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             conn.setDoOutput(true);
             conn.setConnectTimeout(3000);
             conn.setReadTimeout(3000);
-            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-            // Send JSON request
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(jsonRequest.getBytes(StandardCharsets.UTF_8));
             }
 
-            // Read JSON response
-            if (conn.getResponseCode() == 200) {
-                Map<String, String> result = mapper.readValue(conn.getInputStream(), Map.class);
-                response = result.getOrDefault("Status", "Message sent successfully");
+            int statusCode = conn.getResponseCode();
+            if (statusCode == HttpURLConnection.HTTP_OK || statusCode == HttpURLConnection.HTTP_CREATED) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder responseBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        responseBuilder.append(line);
+                    }
+                    Map<String, String> result = mapper.readValue(responseBuilder.toString(), new TypeReference<>() {});
+                    return result.getOrDefault("Status", "Message sent successfully");
+                }
             } else {
-                response = "Message not successful: HTTP " + conn.getResponseCode();
-                log.error("Postmaster REST failed with HTTP code {}", conn.getResponseCode());
+                log.error("Postmaster REST failed with HTTP code {}", statusCode);
+                return "Message not successful: HTTP " + statusCode;
             }
 
         } catch (Exception err) {
-            response = "Message not successful";
             log.error("Email Notification Service failed in {} with error: ", Postmaster.class.getName(), err);
             try {
                 Spectre.recordError("EM-20007", err.getMessage(), Postmaster.class.getName());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            return "Message not successful";
         }
-
-        return response;
     }
 }

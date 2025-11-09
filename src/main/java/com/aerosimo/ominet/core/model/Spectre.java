@@ -34,25 +34,26 @@ package com.aerosimo.ominet.core.model;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Spectre client utility that calls Spectre REST service instead of SOAP.
- * Supports recordError and getTopErrors operations.
+ * Spectre client utility for recording errors via REST.
  */
 public class Spectre {
 
-    private static final String BASE_URL = "http://ominet.aerosimo.com:8081/spectre/api";
+    private static final String BASE_URL = "https://ominet.aerosimo.com:9443/spectre/api";
     private static final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Stores a new error in Spectre.
-     * @param faultCode error code
+     *
+     * @param faultCode    error code
      * @param faultMessage error message
      * @param faultService originating service
      * @return server response (e.g. generated error reference)
@@ -61,60 +62,11 @@ public class Spectre {
     public static String recordError(String faultCode, String faultMessage, String faultService) throws Exception {
         String endpoint = BASE_URL + "/errors";
 
-        // Construct JSON payload
         String payload = mapper.writeValueAsString(Map.of(
                 "faultCode", faultCode,
                 "faultMessage", faultMessage,
-                "faultService", faultService
-        ));
+                "faultService", faultService));
 
-        String json = post(endpoint, payload);
-        // Expecting {"recordError":"ERR|XYZ123"} style response
-        Map<String, Object> response = mapper.readValue(json, new TypeReference<>() {});
-        return response.getOrDefault("recordError", "UNKNOWN").toString();
-    }
-
-    /**
-     * Fetches top errors from Spectre REST API.
-     * @param count number of records to fetch
-     * @return list of errors as List<Map<String,Object>>
-     * @throws Exception if HTTP request fails
-     */
-    public static List<Map<String, Object>> getTopErrors(int count) throws Exception {
-        String endpoint = BASE_URL + "/errors?records=" + count;
-        String json = get(endpoint);
-        return mapper.readValue(json, new TypeReference<>() {});
-    }
-
-    /**
-     * Executes a GET request and returns response as String.
-     */
-    private static String get(String endpoint) throws Exception {
-        HttpURLConnection conn = (HttpURLConnection) new URL(endpoint).openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(3000);
-        conn.setReadTimeout(3000);
-
-        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new RuntimeException("GET failed : HTTP error code : " + conn.getResponseCode());
-        }
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            return sb.toString();
-        } finally {
-            conn.disconnect();
-        }
-    }
-
-    /**
-     * Executes a POST request with JSON payload.
-     */
-    private static String post(String endpoint, String payload) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(endpoint).openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
@@ -126,9 +78,9 @@ public class Spectre {
             os.write(payload.getBytes(StandardCharsets.UTF_8));
         }
 
-        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK &&
-                conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-            throw new RuntimeException("POST failed : HTTP error code : " + conn.getResponseCode());
+        int status = conn.getResponseCode();
+        if (status != HttpURLConnection.HTTP_OK && status != HttpURLConnection.HTTP_CREATED) {
+            throw new RuntimeException("POST failed: HTTP error code " + status);
         }
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
@@ -137,7 +89,8 @@ public class Spectre {
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
-            return sb.toString();
+            Map<String, Object> response = mapper.readValue(sb.toString(), new TypeReference<>() {});
+            return response.getOrDefault("recordError", "UNKNOWN").toString();
         } finally {
             conn.disconnect();
         }
