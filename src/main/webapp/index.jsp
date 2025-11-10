@@ -236,24 +236,35 @@
       </div>
     </div>
     <footer> AuthCore Project &copy; <%= java.time.Year.now() %> | Powered by Aerosimo </footer>
-    <script>
-      async function tryEndpoint(endpoint, payloadId, responseId) {
-        const payloadText = document.getElementById(payloadId).value;
-        const responseBox = document.getElementById(responseId);
-        try {
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: payloadText
-          });
-          const result = await response.json();
-          responseBox.textContent = JSON.stringify(result, null, 2);
-        } catch (err) {
-          responseBox.textContent = "Error: " + err.message;
-        }
-      }
-    </script>
+        <script>
+          async function tryEndpoint(endpoint, payloadId, responseId) {
+            const payloadText = document.getElementById(payloadId).value;
+            const responseBox = document.getElementById(responseId);
+            responseBox.textContent = "⏳ Sending request...";
+
+            try {
+              const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+                },
+                body: payloadText
+              });
+
+              const contentType = response.headers.get("content-type");
+              if (contentType && contentType.includes("application/json")) {
+                const result = await response.json();
+                responseBox.textContent = JSON.stringify(result, null, 2);
+              } else {
+                const text = await response.text();
+                responseBox.textContent =
+                  "⚠️ Received non-JSON response:\n\n" + text.substring(0, 500);
+              }
+            } catch (err) {
+              responseBox.textContent = "❌ Error: " + err.message;
+            }
+          }
+        </script>
   </body>
 </html>
