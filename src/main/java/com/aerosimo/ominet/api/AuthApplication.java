@@ -2,7 +2,7 @@
  * This piece of work is to enhance authcore project functionality.           *
  *                                                                            *
  * Author:    eomisore                                                        *
- * File:      AuthCoreApplication.java                                        *
+ * File:      AuthApplication.java                                        *
  * Created:   01/11/2025, 14:05                                               *
  * Modified:  09/11/2025, 19:30                                               *
  *                                                                            *
@@ -35,6 +35,6 @@ import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
 @ApplicationPath("/api")
-public class AuthCoreApplication extends Application {
+public class AuthApplication extends Application {
     // Auto-scans classes annotated with @Path
 }
