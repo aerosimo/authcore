@@ -237,13 +237,19 @@
     </div>
     <footer> AuthCore Project &copy; <%= java.time.Year.now() %> | Powered by Aerosimo </footer>
         <script>
+          // Dynamically get context path from JSP
+          const contextPath = "<%= request.getContextPath() %>";
+
           async function tryEndpoint(endpoint, payloadId, responseId) {
             const payloadText = document.getElementById(payloadId).value;
             const responseBox = document.getElementById(responseId);
             responseBox.textContent = "⏳ Sending request...";
 
             try {
-              const response = await fetch(endpoint, {
+              // Full endpoint URL based on context
+              const fullUrl = `${contextPath}${endpoint}`;
+
+              const response = await fetch(fullUrl, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -253,6 +259,7 @@
               });
 
               const contentType = response.headers.get("content-type");
+
               if (contentType && contentType.includes("application/json")) {
                 const result = await response.json();
                 responseBox.textContent = JSON.stringify(result, null, 2);
