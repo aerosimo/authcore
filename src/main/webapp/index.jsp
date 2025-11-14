@@ -35,137 +35,23 @@
    <head>
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta content="Elijah Omisore" name="author">
+     <meta content="authcore 1.0.0" name="generator">
+     <meta content="authcore" name="application-name">
+     <meta content="IE=edge" http-equiv="X-UA-Compatible">
+     <meta content="authcore" name="apple-mobile-web-app-title">
+     <meta content="Oracle, Java, Tomcat, Maven, SOA, OSB, Jenkins, Bitbucket, Github, MFT" name="keywords">
+     <!-- Title -->
      <title>AuthCore | Aerosimo Ltd</title>
-     <style>
-       body {
-         font-family: "Segoe UI", sans-serif;
-         background-color: #f4f3fb;
-         margin: 0;
-         color: #333;
-       }
-
-       header {
-         background-color: #4d3b7a;
-         color: white;
-         text-align: center;
-         padding: 1rem 0 1.5rem 0;
-         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-       }
-
-       header img {
-         max-width: 100px;
-         margin-bottom: 0.5rem;
-       }
-
-       .container {
-         max-width: 1100px;
-         margin: 2rem auto;
-         padding: 0 1rem;
-       }
-
-       .intro {
-         text-align: center;
-         margin-bottom: 2rem;
-       }
-
-       .card {
-         background: white;
-         border-radius: 12px;
-         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-         padding: 1.5rem;
-         margin-bottom: 1.5rem;
-         border-left: 6px solid #4d3b7a;
-       }
-
-       .endpoint-title {
-         font-size: 1.2rem;
-         color: #4d3b7a;
-         margin-bottom: 0.3rem;
-       }
-
-       .endpoint-url {
-         font-family: monospace;
-         background: #f1eefb;
-         padding: 0.4rem 0.7rem;
-         border-radius: 6px;
-         display: inline-block;
-         color: #222;
-       }
-
-       .method {
-         font-weight: bold;
-         background: #4d3b7a;
-         color: #fff;
-         border-radius: 5px;
-         padding: 0.2rem 0.5rem;
-         font-size: 0.85rem;
-       }
-
-       textarea {
-         width: 100%;
-         height: 100px;
-         font-family: monospace;
-         padding: 0.5rem;
-         border-radius: 6px;
-         border: 1px solid #ccc;
-         margin-top: 0.5rem;
-         resize: vertical;
-       }
-
-       button {
-         background-color: #4d3b7a;
-         color: white;
-         border: none;
-         padding: 0.5rem 1rem;
-         border-radius: 8px;
-         cursor: pointer;
-         margin-top: 0.5rem;
-       }
-
-       button:hover {
-         background-color: #3c2f62;
-       }
-
-       pre {
-         background: #f1eefb;
-         padding: 0.75rem;
-         border-radius: 8px;
-         overflow-x: auto;
-         max-height: 250px;
-         position: relative;
-       }
-
-       .status-badge {
-         display: inline-block;
-         margin-left: 10px;
-         padding: 2px 6px;
-         border-radius: 5px;
-         font-weight: bold;
-         font-size: 0.85rem;
-       }
-
-       .success {
-         background-color: #4CAF50;
-         color: white;
-       }
-
-       .error {
-         background-color: #F44336;
-         color: white;
-       }
-
-       footer {
-         background-color: #4d3b7a;
-         color: white;
-         text-align: center;
-         padding: 1rem;
-         margin-top: 3rem;
-         font-size: 0.9rem;
-       }
-     </style>
+     <!-- Favicon -->
+     <link href="assets/img/favicon/favicon.ico" rel="shortcut icon"/>
+     <link href="assets/img/favicon/favicon.ico" rel="icon" type="image/x-icon">
+     <link href="assets/img/favicon/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+     <link href="assets/img/favicon/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+     <link href="assets/img/favicon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
+     <link href="assets/img/favicon/android-chrome-192x192.png" rel="android-chrome" sizes="192x192">
+     <!-- CSS (local) -->
+     <link href="assets/css/main.css" rel="stylesheet">
    </head>
    <body>
      <header>
@@ -251,53 +137,7 @@
        </div>
      </div>
      <footer> AuthCore Project &copy; <%= java.time.Year.now() %> | Powered by Aerosimo </footer>
-     <script>
-       // Use JSP context path to ensure correct deployment URL
-       const contextPath = "<%= request.getContextPath() %>";
-       async function tryEndpoint(endpoint, payloadId, responseId) {
-         const payloadText = document.getElementById(payloadId).value;
-         const responseBox = document.getElementById(responseId);
-         // Reset previous content and badge
-         responseBox.textContent = "⏳ Sending request...";
-         responseBox.className = "";
-         // Clean endpoint path
-         const cleanEndpoint = endpoint.startsWith("/") ? endpoint.substring(1) : endpoint;
-         const fullUrl = `${contextPath}/${cleanEndpoint}`;
-         console.log("Sending request to:", fullUrl); // Debugging
-         try {
-           const response = await fetch(fullUrl, {
-             method: "POST",
-             headers: {
-               "Content-Type": "application/json",
-               "Accept": "application/json"
-             },
-             body: payloadText
-           });
-           const contentType = response.headers.get("content-type");
-           if (contentType && contentType.includes("application/json")) {
-             const result = await response.json();
-             responseBox.textContent = JSON.stringify(result, null, 2);
-             // Success badge
-             const badge = document.createElement("span");
-             badge.className = "status-badge success";
-             badge.textContent = "✅ Success";
-             responseBox.appendChild(badge);
-           } else {
-             const text = await response.text();
-             responseBox.textContent = "⚠️ Received non-JSON response:\n\n" + text.substring(0, 500);
-             const badge = document.createElement("span");
-             badge.className = "status-badge error";
-             badge.textContent = "❌ Error";
-             responseBox.appendChild(badge);
-           }
-         } catch (err) {
-           responseBox.textContent = "❌ Error: " + err.message;
-           const badge = document.createElement("span");
-           badge.className = "status-badge error";
-           badge.textContent = "❌ Error";
-           responseBox.appendChild(badge);
-         }
-       }
-     </script>
+    <!-- JS (local) -->
+    <script src="assets/js/main.js"></script>
    </body>
  </html>
