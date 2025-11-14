@@ -3,8 +3,8 @@
  *                                                                            *
  * Author:    eomisore                                                        *
  * File:      AuthREST.java                                                   *
- * Created:   07/11/2025, 23:19                                               *
- * Modified:  09/11/2025, 19:30                                               *
+ * Created:   10/11/2025, 20:17                                               *
+ * Modified:  14/11/2025, 01:23                                               *
  *                                                                            *
  * Copyright (c)  2025.  Aerosimo Ltd                                         *
  *                                                                            *
@@ -29,7 +29,7 @@
  *                                                                            *
  ******************************************************************************/
 
-package com.aerosimo.ominet.api;
+package com.aerosimo.ominet.api.rest;
 
 import com.aerosimo.ominet.dao.impl.*;
 import com.aerosimo.ominet.dao.mapper.AuthDAO;
@@ -45,31 +45,29 @@ import org.apache.logging.log4j.Logger;
 @Path("/auth")
 public class AuthREST {
 
-    private static final Logger log = LogManager.getLogger(AuthREST.class.getName());
+    private static final Logger log = LogManager.getLogger(AuthREST.class);
 
     @POST
     @Path("/register")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(RegisterRequestDTO req) {
-        log.info("Received registration request for {}", req.email);
-        APIResponseDTO result = AuthDAO.registerUser(req.username, req.email, req.password);
-        String status = result.getStatus();
-        String message = result.getMessage();
-        switch (status.toUpperCase()) {
+        log.info("Registering user: {}", req.getEmail());
+        APIResponseDTO result = AuthDAO.registerUser(req.getUsername(), req.getEmail(), req.getPassword());
+        switch (result.getStatus().toUpperCase()) {
             case "SUCCESS":
-                return Response.ok(new APIResponseDTO("success", message)).build();
+                return Response.ok(result).build();
             case "EMAIL_EXISTS":
                 return Response.status(Response.Status.CONFLICT)
-                        .entity(new APIResponseDTO("unsuccessful", "email already registered"))
+                        .entity(new APIResponseDTO("unsuccessful", "Email already registered"))
                         .build();
             case "PASSWORD_ERROR":
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new APIResponseDTO("unsuccessful", "invalid password"))
+                        .entity(new APIResponseDTO("unsuccessful", "Invalid password"))
                         .build();
             default:
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new APIResponseDTO("unsuccessful", message))
+                        .entity(new APIResponseDTO("unsuccessful", result.getMessage()))
                         .build();
         }
     }
@@ -79,13 +77,13 @@ public class AuthREST {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response verify(VerifyRequestDTO req) {
-        log.info("Received verification request for {}", req.token);
-        String result = AuthDAO.verifyEmail(req.token);
-        if (result.equalsIgnoreCase("success")) {
-            return Response.ok(new APIResponseDTO("success", "")).build();
+        log.info("Verifying token: {}", req.getToken());
+        String result = AuthDAO.verifyEmail(req.getToken());
+        if ("success".equalsIgnoreCase(result)) {
+            return Response.ok(new APIResponseDTO("success", "Email verified successfully")).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new APIResponseDTO("unsuccessful", ""))
+                    .entity(new APIResponseDTO("unsuccessful", "Invalid or expired token"))
                     .build();
         }
     }
@@ -95,15 +93,14 @@ public class AuthREST {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response login(LoginRequestDTO req) {
-        log.info("Preparing to login user...");
-        APIResponseDTO result = AuthDAO.userLogin(req.username, req.password);
-        String status = result.getStatus();
-        String message = result.getMessage();
-        if (status.equalsIgnoreCase("success")) {
-            return Response.ok(new APIResponseDTO(status, message)).build();
+        log.info("Login attempt for user: {}", req.getUsername());
+        APIResponseDTO result = AuthDAO.userLogin(req.getUsername(), req.getPassword());
+        if ("success".equalsIgnoreCase(result.getStatus())) {
+            // AuthDAO.userLogin returns authKey in message
+            return Response.ok(result).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new APIResponseDTO("unsuccessful", ""))
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(new APIResponseDTO("unsuccessful", "Invalid credentials"))
                     .build();
         }
     }
@@ -113,13 +110,13 @@ public class AuthREST {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response validate(ValidateRequestDTO req) {
-        log.info("Preparing to validate authentication key...");
-        String result = AuthDAO.validateAuthKey(req.authKey);
-        if (result.equalsIgnoreCase("valid")) {
-            return Response.ok(new APIResponseDTO(result, "")).build();
+        log.info("Validating authKey: {}", req.getAuthKey());
+        String result = AuthDAO.validateAuthKey(req.getAuthKey());
+        if ("valid".equalsIgnoreCase(result)) {
+            return Response.ok(new APIResponseDTO("success", "Token is valid")).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new APIResponseDTO("invalid", ""))
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(new APIResponseDTO("unsuccessful", "Invalid or expired token"))
                     .build();
         }
     }
@@ -129,14 +126,13 @@ public class AuthREST {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response logout(LogoutRequestDTO req) {
-        log.info("Preparing to logout user...");
-        String result = AuthDAO.userLogout(req.authKey);
-        log.info("User is now logged out with the following {}", result);
-        if (result.equalsIgnoreCase("success")) {
-            return Response.ok(new APIResponseDTO(result, "")).build();
+        log.info("Logging out token: {}", req.getAuthKey());
+        String result = AuthDAO.userLogout(req.getAuthKey());
+        if ("success".equalsIgnoreCase(result)) {
+            return Response.ok(new APIResponseDTO("success", "Logged out successfully")).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new APIResponseDTO("unsuccessful", ""))
+                    .entity(new APIResponseDTO("unsuccessful", "Logout failed"))
                     .build();
         }
     }

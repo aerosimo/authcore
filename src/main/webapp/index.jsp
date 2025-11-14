@@ -44,12 +44,12 @@
      <!-- Title -->
      <title>AuthCore | Aerosimo Ltd</title>
      <!-- Favicon -->
-     <link href="assets/img/favicon/favicon.ico" rel="shortcut icon"/>
-     <link href="assets/img/favicon/favicon.ico" rel="icon" type="image/x-icon">
-     <link href="assets/img/favicon/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
-     <link href="assets/img/favicon/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
-     <link href="assets/img/favicon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
-     <link href="assets/img/favicon/android-chrome-192x192.png" rel="android-chrome" sizes="192x192">
+     <link href="assets/img/favicon.ico" rel="shortcut icon"/>
+     <link href="assets/img/favicon.ico" rel="icon" type="image/x-icon">
+     <link href="assets/img/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+     <link href="assets/img/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
+     <link href="assets/img/android-chrome-192x192.png" rel="android-chrome" sizes="192x192">
      <!-- CSS (local) -->
      <link href="assets/css/main.css" rel="stylesheet">
    </head>

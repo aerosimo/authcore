@@ -1,0 +1,75 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ This piece of work is to enhance authcore project functionality.          ~
+  ~                                                                           ~
+  ~ Author:    eomisore                                                       ~
+  ~ File:      documentation.html                                             ~
+  ~ Created:   14/11/2025, 01:55                                              ~
+  ~ Modified:  14/11/2025, 02:05                                              ~
+  ~                                                                           ~
+  ~ Copyright (c)  2025.  Aerosimo Ltd                                        ~
+  ~                                                                           ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a   ~
+  ~ copy of this software and associated documentation files (the "Software"),~
+  ~ to deal in the Software without restriction, including without limitation ~
+  ~ the rights to use, copy, modify, merge, publish, distribute, sublicense,  ~
+  ~ and/or sell copies of the Software, and to permit persons to whom the     ~
+  ~ Software is furnished to do so, subject to the following conditions:      ~
+  ~                                                                           ~
+  ~ The above copyright notice and this permission notice shall be included   ~
+  ~ in all copies or substantial portions of the Software.                    ~
+  ~                                                                           ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,           ~
+  ~ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES           ~
+  ~ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                  ~
+  ~ NONINFINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT                ~
+  ~ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,              ~
+  ~ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING              ~
+  ~ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE                ~
+  ~ OR OTHER DEALINGS IN THE SOFTWARE.                                        ~
+  ~                                                                           ~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Elijah Omisore" name="author">
+    <meta content="authcore 1.0.0" name="generator">
+    <meta content="authcore" name="application-name">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="authcore" name="apple-mobile-web-app-title">
+    <meta content="Oracle, Java, Tomcat, Maven, SOA, OSB, Jenkins, Bitbucket, Github, MFT" name="keywords">
+    <!-- Title -->
+    <title>AuthCore API Docs | Aerosimo Ltd</title>
+    <!-- Favicon -->
+    <link href="src/main/webapp/assets/img/favicon.ico" rel="shortcut icon"/>
+    <link href="src/main/webapp/assets/img/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="src/main/webapp/assets/img/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+    <link href="src/main/webapp/assets/img/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+    <link href="src/main/webapp/assets/img/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
+    <link href="src/main/webapp/assets/img/android-chrome-192x192.png" rel="android-chrome" sizes="192x192">
+    <!-- CSS (local) -->
+    <link href="src/main/webapp/assets/css/documentation.css" rel="stylesheet">
+</head>
+<body>
+<header>
+    <img src="https://thumbs4.imagebam.com/3e/10/82/MED2HDH_t.png" alt="Aerosimo Logo">
+    <h1>AuthCore API Documentation</h1>
+    <p>A hub where all authentication flows converge</p>
+</header>
+<div class="container">
+    <div class="card">
+        <div class="endpoint-title">Login</div>
+        <div><span class="method">POST</span> <span class="endpoint-url">/auth/login</span></div>
+        <textarea id="loginPayload">{ "username":"john_doe", "password":"P@ssw0rd" }</textarea>
+        <button onclick="tryEndpoint('/auth/login','loginPayload','loginResp')">Try It</button>
+        <pre id="loginResp"></pre>
+    </div>
+    <!-- Add similar cards for /register, /verify, /validate, /logout -->
+</div>
+<footer>AuthCore Project &copy; 2025 | Aerosimo Ltd</footer>
+<!-- JS (local) -->
+<script src="src/main/webapp/assets/js/documentation.js"></script>
+</body>
+</html>

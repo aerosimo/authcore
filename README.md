@@ -102,16 +102,59 @@ AuthCore serves as a **custom token authentication hub** designed to emulate lig
 
 ---
 
+## 🛡️ AuthCore Security Architecture
+
+        +-------------------+
+        |     Client App    |
+        | (Web, Mobile)    |
+        +---------+---------+
+                  |
+                  v
+        +-------------------+
+        |   AuthREST API    |
+        |  (Login/Register) |
+        +---------+---------+
+                  |
+                  v
+        +-------------------+
+        |     AuthFilter    |
+        |     (@Secured)    |
+        +---------+---------+
+                  |
+           Token Valid? Yes/No
+                  |
+           +------+------+
+           |             |
+        +---v---+    +---v---+
+        | Valid |    | Invalid|
+        | Token |    | Token  |
+        +-------+    +-------+
+            |            |
+    Access Granted   401/403 Response
+
+---
+
 ## 🗃️ Project Structure
 
 <pre>
 authcore/
 ├─ README.md
 ├─ LICENSE
+├─ authcore.yaml
+├─ documentation.html
 ├─ pom.xml
 ├─ src/main/java/com/aerosimo/ominet/api/
 │  ├─ AuthApplication.java
+│  ├─ Secured.java
+├─ src/main/java/com/aerosimo/ominet/api/rest/
 │  ├─ AuthREST.java
+├─ src/main/java/com/aerosimo/ominet/api/filters/
+│  ├─ AuthFilter.java
+├─ src/main/java/com/aerosimo/ominet/core/config/
+│  ├─ Connect.java
+├─ src/main/java/com/aerosimo/ominet/core/model/
+│  ├─ Postmaster.java
+│  ├─ Spectre.java
 ├─ src/main/java/com/aerosimo/ominet/dao/impl/
 │  ├─ APIResponseDTO.java
 │  ├─ RegisterRequestDTO.java
@@ -121,6 +164,9 @@ authcore/
 │  ├─ VerifyRequestDTO.java
 ├─ src/main/java/com/aerosimo/ominet/dao/mapper/
 │  ├─ AuthDAO.java
+├─ src/main/java/com/aerosimo/ominet/mail/
+│  ├─ AuthenticationEmail.java
+│  ├─ WelcomeEmail.java
 ├─ src/main/webapp/WEB-INF/
 │  ├─ web.xml
 ├─ src/main/webapp/
@@ -132,6 +178,11 @@ authcore/
 </pre>
 
 ---
+
+## 📚 API Documentation
+
+- Swagger/OpenAPI: [authcore.yaml](authcore.yaml)
+- Interactive docs: [documentation.html](documentation.html)
 
 ## ⚙️ Configuration Files
 
