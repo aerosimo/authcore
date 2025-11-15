@@ -34,7 +34,7 @@ Any reliance you place on such information is therefore strictly at your own ris
 
 ---
 
-![Project Cover](src/main/webapp/assets/img/cover.jpg "AuthCore")
+![Project Cover](src/main/webapp/assets/img/cover.png "AuthCore")
 
 # AuthCore
 ### 🔐 A Hub Where All Authentication Flows Converge
@@ -141,7 +141,6 @@ authcore/
 ├─ README.md
 ├─ LICENSE
 ├─ authcore.yaml
-├─ documentation.html
 ├─ pom.xml
 ├─ src/main/java/com/aerosimo/ominet/api/
 │  ├─ AuthApplication.java
@@ -174,7 +173,7 @@ authcore/
 │  ├─ assets/img/
 │     ├─ logo.png
 │     ├─ MIT.png
-│     ├─ project.webp
+│     ├─ cover.png
 </pre>
 
 ---
@@ -182,7 +181,6 @@ authcore/
 ## 📚 API Documentation
 
 - Swagger/OpenAPI: [authcore.yaml](authcore.yaml)
-- Interactive docs: [documentation.html](documentation.html)
 
 ## ⚙️ Configuration Files
 
