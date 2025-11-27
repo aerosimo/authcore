@@ -31,7 +31,7 @@
 
 package com.aerosimo.ominet.mail;
 
-import com.aerosimo.ominet.core.model.Postmaster;
+import com.aerosimo.ominet.core.model.Herald;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,7 +48,7 @@ public class AuthenticationEmail {
                     "<html lang=\"en\">\n" +
                     "<head>\n" +
                     "  <meta charset=\"UTF-8\">\n" +
-                    "  <title>Sentinel Authentication Token</title>\n" +
+                    "  <title>Ominet Authentication Token</title>\n" +
                     "  <style>\n" +
                     "    body {\n" +
                     "      font-family: system-ui, -apple-system, Segoe UI, Roboto, \"Helvetica Neue\", Arial, sans-serif;\n" +
@@ -120,8 +120,8 @@ public class AuthenticationEmail {
                     "<body>\n" +
                     "  <div class=\"container\">\n" +
                     "    <div class=\"header\">\n" +
-                    "      <img src=\"https://thumbs4.imagebam.com/3e/10/82/MED2HDH_t.png\" alt=\"Sentinel Logo\">\n" +
-                    "      <h2>Sentinel Authentication</h2>\n" +
+                    "      <img src=\"https://thumbs4.imagebam.com/3e/10/82/MED2HDH_t.png\" alt=\"Ominet Logo\">\n" +
+                    "      <h2>Ominet Authentication</h2>\n" +
                     "    </div>\n" +
                     "    <div class=\"content\">\n" +
                     "      <h1>Hi, <strong>");
@@ -137,14 +137,14 @@ public class AuthenticationEmail {
                     "      <p>If you did not request this, you can safely ignore this email.</p>\n" +
                     "    </div>\n" +
                     "    <div class=\"footer\">\n" +
-                    "      &copy; <script>document.write(new Date().getFullYear());</script> Sentinel by Aerosimo Ltd. All rights reserved.<br>\n" +
+                    "      &copy; <script>document.write(new Date().getFullYear());</script> Ominet by Aerosimo Ltd. All rights reserved.<br>\n" +
                     "      This is an automated message, please do not reply.\n" +
                     "    </div>\n" +
                     "  </div>\n" +
                     "</body>\n" +
                     "</html>");
-            response = Postmaster.sendEmail(email,"Sentinel login notification",memo.toString(),"");
-            log.info("Sent login notification email from Sentinel to {}", email);
+            response = Herald.announce(email,"Ominet login notification",memo.toString(),"");
+            log.info("Sent login notification email from Ominet to {}", email);
         } catch (Exception err) {
             response = "Login Email failed";
             log.error("{} failed with email error - {}", AuthenticationEmail.class.getName(), err);

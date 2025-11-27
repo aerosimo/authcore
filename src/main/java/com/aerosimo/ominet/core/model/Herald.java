@@ -2,9 +2,9 @@
  * This piece of work is to enhance authcore project functionality.           *
  *                                                                            *
  * Author:    eomisore                                                        *
- * File:      Spectre.java                                                    *
- * Created:   02/11/2025, 15:35                                               *
- * Modified:  02/11/2025, 15:35                                               *
+ * File:      Herald.java                                                     *
+ * Created:   27/11/2025, 16:03                                               *
+ * Modified:  27/11/2025, 16:03                                               *
  *                                                                            *
  * Copyright (c)  2025.  Aerosimo Ltd                                         *
  *                                                                            *
@@ -44,60 +44,55 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class Spectre {
+public class Herald {
 
-    private static final Logger log = LogManager.getLogger(Spectre.class);
-    private static final String BASE_URL = "https://ominet.aerosimo.com:9443/spectre/api/errors";
+    private static final Logger log = LogManager.getLogger(Herald.class.getName());
+    private static final String ENDPOINT_URL = "https://ominet.aerosimo.com:9443/mailbridge/api/bridge/dispatch";
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static SpectreResponse recordError(String faultCode, String faultMessage, String faultService) throws Exception {
-        String endpoint = BASE_URL + "/stow";
-        String payload = mapper.writeValueAsString(Map.of(
-                "faultCode", faultCode,
-                "faultMessage", faultMessage,
-                "faultService", faultService));
-        log.info("Calling Spectre endpoint {} to stow the error", endpoint);
-        HttpURLConnection conn = (HttpURLConnection) new URL(endpoint).openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        conn.setConnectTimeout(4000);
-        conn.setReadTimeout(4000);
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(payload.getBytes(StandardCharsets.UTF_8));
-        }
-        int status = conn.getResponseCode();
-        log.info("Spectre endpoint {} returned with status {}", endpoint, status);
-        BufferedReader br = new BufferedReader(new InputStreamReader(
-                (status >= 200 && status < 300) ? conn.getInputStream() : conn.getErrorStream(),
-                StandardCharsets.UTF_8
-        ));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-        conn.disconnect();
-        Map<String, Object> responseMap = mapper.readValue(sb.toString(), new TypeReference<>() {});
-        String respStatus = responseMap.getOrDefault("status", "unknown").toString();
-        String respMessage = responseMap.getOrDefault("message", "no message").toString();
+    public static String announce(String emailAddress, String emailSubject, String emailMessage, String emailFiles) {
+        try {
+            Map<String, Object> payload = Map.of(
+                    "emailAddress", emailAddress,
+                    "emailSubject", emailSubject,
+                    "emailMessage", emailMessage,
+                    "emailFiles", emailFiles);
+            log.info("Sending email to: {}", emailAddress);
 
-        return new SpectreResponse(respStatus, respMessage);
-    }
-    public static class SpectreResponse {
-        private String status;
-        private String message;
+            String jsonRequest = mapper.writeValueAsString(payload);
 
-        public SpectreResponse(String status, String message) {
-            this.status = status;
-            this.message = message;
-        }
-        public String getStatus() { return status; }
-        public String getMessage() { return message; }
+            HttpURLConnection conn = (HttpURLConnection) new URL(ENDPOINT_URL).openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(3000);
 
-        @Override
-        public String toString() {
-            return "SpectreResponse{status='" + status + "', message='" + message + "'}";
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(jsonRequest.getBytes(StandardCharsets.UTF_8));
+            }
+
+            int statusCode = conn.getResponseCode();
+            log.info("Status code: {}", statusCode);
+            if (statusCode == HttpURLConnection.HTTP_OK || statusCode == HttpURLConnection.HTTP_CREATED) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder responseBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        responseBuilder.append(line);
+                    }
+                    Map<String, String> result = mapper.readValue(responseBuilder.toString(), new TypeReference<>() {
+                    });
+                    return result.getOrDefault("Status", "Message sent successfully");
+                }
+            } else {
+                log.error("Postmaster REST failed with HTTP code {}", statusCode);
+                return "Message not successful: HTTP " + statusCode;
+            }
+
+        } catch (Exception err) {
+            log.error("Email Notification Service failed in {} with error: ", Herald.class.getName(), err);
+            return "Message not successful";
         }
     }
 }

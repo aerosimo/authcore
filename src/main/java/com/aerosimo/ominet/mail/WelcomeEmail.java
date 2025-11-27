@@ -31,7 +31,7 @@
 
 package com.aerosimo.ominet.mail;
 
-import com.aerosimo.ominet.core.model.Postmaster;
+import com.aerosimo.ominet.core.model.Herald;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,7 +49,7 @@ public class WelcomeEmail {
                     "<head>\n" +
                     "  <meta charset=\"UTF-8\">\n" +
                     "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                    "  <title>Welcome to Sentinel</title>\n" +
+                    "  <title>Welcome to Ominet</title>\n" +
                     "</head>\n" +
                     "<body style=\"margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f4f7; color:#333;\">\n" +
                     "  <table align=\"center\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#f4f4f7; padding:20px;\">\n" +
@@ -60,7 +60,7 @@ public class WelcomeEmail {
                     "          <tr>\n" +
                     "            <td align=\"center\" style=\"background-color:#4d3b7a; padding:20px;\">\n" +
                     "              <img src=\"https://thumbs4.imagebam.com/3e/10/82/MED2HDH_t.png\" alt=\"Aerosimo Logo\" style=\"max-width:100px; display:block;\">\n" +
-                    "              <h1 style=\"color:#ffffff; margin:10px 0 0; font-size:24px;\">Welcome to Sentinel</h1>\n" +
+                    "              <h1 style=\"color:#ffffff; margin:10px 0 0; font-size:24px;\">Welcome to Ominet</h1>\n" +
                     "            </td>\n" +
                     "          </tr>\n" +
                     "\n" +
@@ -70,7 +70,7 @@ public class WelcomeEmail {
                     "              <p>Hi ");
             memo.append(username);
             memo.append(",</p>\n" +
-                    "              <p><strong>Sentinel</strong> is your diligent and watchful guardian, keeping track of your servers and providing <strong>real-time insights</strong> to ensure smooth operations.</p>\n" +
+                    "              <p><strong>Ominet</strong> is your diligent and watchful guardian, keeping track of your servers and providing <strong>real-time insights</strong> to ensure smooth operations.</p>\n" +
                     "              \n" +
                     "              <p>Before you can get started, please verify your email address using the code below:</p>\n" +
                     "\n" +
@@ -82,14 +82,14 @@ public class WelcomeEmail {
             memo.append("</div>\n" +
                     "              </div>\n" +
                     "\n" +
-                    "              <p>If you didn’t sign up for Sentinel, you can safely ignore this email.</p>\n" +
+                    "              <p>If you didn’t sign up for Ominet, you can safely ignore this email.</p>\n" +
                     "            </td>\n" +
                     "          </tr>\n" +
                     "\n" +
                     "          <!-- Footer -->\n" +
                     "          <tr>\n" +
                     "            <td align=\"center\" style=\"background-color:#f8f9fa; padding:20px; font-size:14px; color:#666;\">\n" +
-                    "              <p>&copy; <script>document.write(new Date().getFullYear());</script> Sentinel by Aerosimo Ltd. All rights reserved.</p>\n" +
+                    "              <p>&copy; <script>document.write(new Date().getFullYear());</script> Ominet by Aerosimo Ltd. All rights reserved.</p>\n" +
                     "              <p>\n" +
                     "                <a href=\"mailto:support@aerosimo.com?subject=Confidential%20email%20to%20not%20the%20intended%20recipient\" style=\"color:#4d3b7a; text-decoration:none;\">Contact Support</a> | \n" +
                     "                <a href=\"https://yourdomain.com/settings\" style=\"color:#4d3b7a; text-decoration:none;\">Settings</a>\n" +
@@ -103,8 +103,8 @@ public class WelcomeEmail {
                     "  </table>\n" +
                     "</body>\n" +
                     "</html>");
-            response = Postmaster.sendEmail(email,"Welcome to Sentinel",memo.toString(),"");
-            log.info("Sent welcome email from Sentinel to {}", email);
+            response = Herald.announce(email,"Welcome to Ominet",memo.toString(),"");
+            log.info("Sent welcome email from Ominet to {}", email);
         } catch (Exception err) {
             response = "Welcome Email failed";
             log.error("{} failed with email error - {}", WelcomeEmail.class.getName(), err);

@@ -152,7 +152,7 @@ authcore/
 ├─ src/main/java/com/aerosimo/ominet/core/config/
 │  ├─ Connect.java
 ├─ src/main/java/com/aerosimo/ominet/core/model/
-│  ├─ Postmaster.java
+│  ├─ Herald.java
 │  ├─ Spectre.java
 ├─ src/main/java/com/aerosimo/ominet/dao/impl/
 │  ├─ APIResponseDTO.java
@@ -184,25 +184,8 @@ authcore/
 
 ## ⚙️ Configuration Files
 
-### **web.xml**
+### **Dependency**
 
-Defines REST endpoints and Jersey servlet mapping:
-
-```xml
-<servlet>
-    <servlet-name>rest</servlet-name>
-    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-    <init-param>
-        <param-name>jakarta.ws.rs.Application</param-name>
-        <param-value>com.aerosimo.ominet.api.AuthApplication</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-</servlet>
-<servlet-mapping>
-    <servlet-name>rest</servlet-name>
-    <url-pattern>/api/*</url-pattern>
-</servlet-mapping>
-```
 🧱 Maven Dependencies
 
 ```xml
@@ -241,7 +224,7 @@ Defines REST endpoints and Jersey servlet mapping:
 ## 🚀 Deployment Guide
 ### Prerequisites
 
-* Java: 23 or higher
+* Java: 25 or higher
 * Server: Apache TomEE 10.1.44 (Jakarta EE 10)
 * Database: Oracle 19c
 * Build Tool: Maven 3.9+
