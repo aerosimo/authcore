@@ -145,9 +145,7 @@ authcore/
 ├─ src/main/java/com/aerosimo/ominet/api/
 │  ├─ AuthApplication.java
 │  ├─ Secured.java
-├─ src/main/java/com/aerosimo/ominet/api/rest/
 │  ├─ AuthREST.java
-├─ src/main/java/com/aerosimo/ominet/api/filters/
 │  ├─ AuthFilter.java
 ├─ src/main/java/com/aerosimo/ominet/core/config/
 │  ├─ Connect.java
