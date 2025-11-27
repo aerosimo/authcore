@@ -177,6 +177,7 @@ authcore/
 </pre>
 
 ---
+![Project Cover](src/main/webapp/assets/img/project.jpg "Project")
 
 ## 📚 API Documentation
 
