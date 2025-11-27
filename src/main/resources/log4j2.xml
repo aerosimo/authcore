@@ -33,7 +33,7 @@
 <Configuration status="TRACE">
     <!-- ========= Properties ========= -->
     <Properties>
-        <property name="baseLogDir">/u03/logs/spectre</property>
+        <property name="baseLogDir">/u03/logs/authcore</property>
         <property name="fileyear">${date:yyyy}</property>
         <property name="filemonth">${date:MMMM}</property>
         <property name="fileday">${date:ddMMyyyy}</property>
