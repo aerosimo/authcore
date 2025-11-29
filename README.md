@@ -47,10 +47,12 @@ AuthCore serves as a **custom token authentication hub** designed to emulate lig
 
 ---
 
+![Project Cover](src/main/webapp/assets/img/coding.jpg "Coding")
+
 ## 🧠 Project Badges & Tech Stack
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Java-23%2B-orange?logo=java&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/Java-25%2B-orange?logo=java&logoColor=white" alt="Java">
   <img src="https://img.shields.io/badge/Jakarta%20EE-10-blue?logo=jakartaee&logoColor=white" alt="Jakarta EE 10">
   <img src="https://img.shields.io/badge/Apache%20TomEE-10.1.44-critical?logo=apachetomcat&logoColor=white" alt="Apache TomEE">
   <img src="https://img.shields.io/badge/Oracle%20Database-19c-red?logo=oracle&logoColor=white" alt="Oracle 19c">
