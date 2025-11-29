@@ -2,7 +2,7 @@
  * This piece of work is to enhance authcore project functionality.           *
  *                                                                            *
  * Author:    eomisore                                                        *
- * File:      AuthREST.java                                                   *
+ * File:      AuthCoreREST.java                                                   *
  * Created:   14/11/2025, 01:41                                               *
  * Modified:  27/11/2025, 15:51                                               *
  *                                                                            *
@@ -43,9 +43,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Path("/auth")
-public class AuthREST {
+public class AuthCoreREST {
 
-    private static final Logger log = LogManager.getLogger(AuthREST.class);
+    private static final Logger log = LogManager.getLogger(AuthCoreREST.class);
 
     @POST
     @Path("/register")

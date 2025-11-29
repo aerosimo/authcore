@@ -2,9 +2,9 @@
  * This piece of work is to enhance authcore project functionality.           *
  *                                                                            *
  * Author:    eomisore                                                        *
- * File:      AuthApplication.java                                        *
- * Created:   01/11/2025, 14:05                                               *
- * Modified:  09/11/2025, 19:30                                               *
+ * File:      AuthStatus.java                                                 *
+ * Created:   29/11/2025, 17:14                                               *
+ * Modified:  29/11/2025, 17:14                                               *
  *                                                                            *
  * Copyright (c)  2025.  Aerosimo Ltd                                         *
  *                                                                            *
@@ -31,10 +31,6 @@
 
 package com.aerosimo.ominet.api;
 
-import jakarta.ws.rs.ApplicationPath;
-import jakarta.ws.rs.core.Application;
-
-@ApplicationPath("/api")
-public class AuthApplication extends Application {
-    // Auto-scans classes annotated with @Path
+public enum AuthStatus {
+    VALID, INVALID, EXPIRED, REVOKED, ERROR
 }

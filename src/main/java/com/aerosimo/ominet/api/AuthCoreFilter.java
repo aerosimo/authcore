@@ -2,7 +2,7 @@
  * This piece of work is to enhance authcore project functionality.           *
  *                                                                            *
  * Author:    eomisore                                                        *
- * File:      AuthFilter.java                                                 *
+ * File:      AuthCoreFilter.java                                                 *
  * Created:   14/11/2025, 01:35                                               *
  * Modified:  27/11/2025, 15:51                                               *
  *                                                                            *
@@ -46,55 +46,60 @@ import org.apache.logging.log4j.Logger;
 @Provider
 @Secured
 @Priority(Priorities.AUTHENTICATION)
-public class AuthFilter implements ContainerRequestFilter {
+public class AuthCoreFilter implements ContainerRequestFilter {
 
-    private static final Logger log = LogManager.getLogger(AuthFilter.class.getName());
+    private static final Logger log = LogManager.getLogger(AuthCoreFilter.class);
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        String authHeader = requestContext.getHeaderString("Authorization");
-        log.info("AuthFilter checking Authorization header: {}", authHeader);
 
-        // Check header
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Missing or invalid Authorization header");
-            requestContext.abortWith(
-                    Response.status(Response.Status.UNAUTHORIZED)
-                            .entity(new APIResponseDTO("unsuccessful", "Missing or invalid Authorization header"))
-                            .build()
-            );
+        String path = requestContext.getUriInfo().getPath();
+
+        // Allow public paths
+        if (path.startsWith("public") || path.equals("health")) {
             return;
         }
 
-        // Extract token
+        String authHeader = requestContext.getHeaderString("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            abort(requestContext, "Missing or invalid Authorization header", Response.Status.UNAUTHORIZED);
+            return;
+        }
+
         String token = authHeader.substring("Bearer ".length()).trim();
 
-        // Validate token via AuthDAO
-        String validationResult;
+        if (token.isEmpty()) {
+            abort(requestContext, "Authorization token is empty", Response.Status.UNAUTHORIZED);
+            return;
+        }
+
+        // Validate token
+        AuthStatus status;
         try {
-            validationResult = AuthDAO.validateAuthKey(token);
+            status = AuthStatus.valueOf(AuthDAO.validateAuthKey(token));
         } catch (Exception e) {
-            log.error("Auth DB error during token validation", e);
-            requestContext.abortWith(
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                            .entity(new APIResponseDTO("unsuccessful", "Authentication service error"))
-                            .build()
-            );
+            log.error("Error validating token", e);
+            abort(requestContext, "Authentication service error", Response.Status.INTERNAL_SERVER_ERROR);
             return;
         }
 
-        // Token invalid, revoked, or expired
-        if (!"valid".equalsIgnoreCase(validationResult)) {
-            log.warn("Invalid or revoked token: {}", token);
-            requestContext.abortWith(
-                    Response.status(Response.Status.UNAUTHORIZED)
-                            .entity(new APIResponseDTO("unsuccessful", "Invalid or expired token"))
-                            .build()
-            );
+        if (status != AuthStatus.VALID) {
+            log.warn("Token invalid: {}...", token.substring(0, Math.min(6, token.length())));
+            abort(requestContext, "Invalid or expired token", Response.Status.UNAUTHORIZED);
             return;
         }
 
-        // Token valid — allow request to proceed
-        log.info("Token validated successfully: {}", token);
+        // Token is valid
+        log.info("Token validated successfully: {}...", token.substring(0, Math.min(6, token.length())));
+    }
+
+    private void abort(ContainerRequestContext ctx, String msg, Response.Status status) {
+        ctx.abortWith(
+                Response.status(status)
+                        .entity(new APIResponseDTO("unsuccessful", msg))
+                        .type("application/json")
+                        .build()
+        );
     }
 }
