@@ -64,12 +64,10 @@ public class AuthDAO {
             result = stmt.getString(4);
             response = stmt.getString(5);
             log.info("Successfully create user account with following response: {}", response);
-            if(response.equalsIgnoreCase("SUCCESS")){
+            if(response.equalsIgnoreCase("success")){
                 WelcomeEmail.sendMail(username, email, result);
-                return new APIResponseDTO(response,result);
-            } else {
-                return new APIResponseDTO("unsuccessful", response);
             }
+            return new APIResponseDTO(response,result);
         } catch (SQLException err) {
             log.error("Error in authentication_pkg (CREATE ACCOUNT)", err);
             try {
