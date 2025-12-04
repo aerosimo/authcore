@@ -54,16 +54,16 @@ public class AuthCoreREST {
     public Response register(RegisterRequestDTO req) {
         log.info("Registering user: {}", req.getEmail());
         APIResponseDTO result = AuthDAO.registerUser(req.getUsername(), req.getEmail(), req.getPassword());
-        switch (result.getStatus().toUpperCase()) {
-            case "SUCCESS":
+        switch (result.getStatus()) {
+            case "success":
                 return Response.ok(result).build();
-            case "EMAIL_EXISTS":
+            case "email_exists":
                 return Response.status(Response.Status.CONFLICT)
-                        .entity(new APIResponseDTO("unsuccessful", "Email already registered"))
+                        .entity(new APIResponseDTO("unsuccessful", "email already registered"))
                         .build();
-            case "PASSWORD_ERROR":
+            case "password_error":
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new APIResponseDTO("unsuccessful", "Invalid password"))
+                        .entity(new APIResponseDTO("unsuccessful", "invalid password"))
                         .build();
             default:
                 return Response.status(Response.Status.BAD_REQUEST)
