@@ -68,7 +68,7 @@ public class AuthDAO {
                 WelcomeEmail.sendMail(username, email, result);
                 return new APIResponseDTO(response,result);
             } else {
-                return new APIResponseDTO("unsuccessful", "");
+                return new APIResponseDTO("unsuccessful", response);
             }
         } catch (SQLException err) {
             log.error("Error in authentication_pkg (CREATE ACCOUNT)", err);

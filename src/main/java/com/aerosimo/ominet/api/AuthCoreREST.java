@@ -54,7 +54,7 @@ public class AuthCoreREST {
     public Response register(RegisterRequestDTO req) {
         log.info("Registering user: {}", req.getEmail());
         APIResponseDTO result = AuthDAO.registerUser(req.getUsername(), req.getEmail(), req.getPassword());
-        switch (result.getStatus()) {
+        switch (result.getMessage()) {
             case "success":
                 return Response.ok(result).build();
             case "email_exists":
