@@ -65,10 +65,10 @@ public class AuthCoreREST {
         log.info("Verifying token: {}", req.getToken());
         String result = AuthDAO.verifyEmail(req.getToken());
         if ("success".equalsIgnoreCase(result)) {
-            return Response.ok(new APIResponseDTO("success", "Email verified successfully")).build();
+            return Response.ok(new APIResponseDTO("success", "email verified successfully")).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new APIResponseDTO("unsuccessful", "Invalid or expired token"))
+                    .entity(new APIResponseDTO("unsuccessful", "invalid or expired token"))
                     .build();
         }
     }
@@ -85,7 +85,7 @@ public class AuthCoreREST {
             return Response.ok(result).build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity(new APIResponseDTO("unsuccessful", "Invalid credentials"))
+                    .entity(new APIResponseDTO("unsuccessful", "invalid credentials"))
                     .build();
         }
     }
@@ -98,10 +98,10 @@ public class AuthCoreREST {
         log.info("Validating authKey: {}", req.getAuthKey());
         String result = AuthDAO.validateAuthKey(req.getAuthKey());
         if ("valid".equalsIgnoreCase(result)) {
-            return Response.ok(new APIResponseDTO("success", "Token is valid")).build();
+            return Response.ok(new APIResponseDTO("success", "token is valid")).build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity(new APIResponseDTO("unsuccessful", "Invalid or expired token"))
+                    .entity(new APIResponseDTO("unsuccessful", "invalid or expired token"))
                     .build();
         }
     }
@@ -114,10 +114,42 @@ public class AuthCoreREST {
         log.info("Logging out token: {}", req.getAuthKey());
         String result = AuthDAO.userLogout(req.getAuthKey());
         if ("success".equalsIgnoreCase(result)) {
-            return Response.ok(new APIResponseDTO("success", "Logged out successfully")).build();
+            return Response.ok(new APIResponseDTO("success", "logged out successfully")).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new APIResponseDTO("unsuccessful", "Logout failed"))
+                    .entity(new APIResponseDTO("unsuccessful", "logout failed"))
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/forgot")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response forgot(ForgotRequestDTO req) {
+        log.info("Frgoot Password for account with email: {}", req.getEmail());
+        ForgotResponseDTO result = AuthDAO.forgotPassword(req.getEmail());
+        if ("valid".equalsIgnoreCase(result.getStatus())) {
+            return Response.ok(result).build();
+        } else {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(new APIResponseDTO("unsuccessful", "invalid email"))
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/reset")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response reset(ResetRequestDTO req) {
+        log.info("Password reset with this verification: {}", req.getVerificationToken());
+        String result = AuthDAO.resetPassword(req.getVerificationToken(),req.getPassword());
+        if ("success".equalsIgnoreCase(result)) {
+            return Response.ok(result).build();
+        } else {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(new APIResponseDTO("unsuccessful", "invalid credentials"))
                     .build();
         }
     }

@@ -34,7 +34,9 @@ package com.aerosimo.ominet.dao.mapper;
 import com.aerosimo.ominet.core.config.Connect;
 import com.aerosimo.ominet.core.model.Spectre;
 import com.aerosimo.ominet.dao.impl.APIResponseDTO;
+import com.aerosimo.ominet.dao.impl.ForgotResponseDTO;
 import com.aerosimo.ominet.mail.AuthenticationEmail;
+import com.aerosimo.ominet.mail.ForgotEmail;
 import com.aerosimo.ominet.mail.WelcomeEmail;
 import oracle.jdbc.OracleTypes;
 import org.apache.logging.log4j.LogManager;
@@ -120,7 +122,7 @@ public class AuthDAO {
             authKey = stmt.getString(4);
             response = stmt.getString(5);
             log.info("Successfully login user with following response: {}", response);
-            if(response.equalsIgnoreCase("SUCCESS")){
+            if(response.equalsIgnoreCase("success")){
                 AuthenticationEmail.sendMail(username,email,authKey);
                 return new APIResponseDTO(response,authKey);
             } else {
@@ -175,6 +177,62 @@ public class AuthDAO {
             log.error("Error in authentication_pkg (LOGOUT)", err);
             try {
                 Spectre.recordError("TE-20001", "Error in authentication_pkg (LOGOUT): " + err.getMessage(), AuthDAO.class.getName());
+                response = "internal server error";
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return response;
+    }
+
+    public static ForgotResponseDTO forgotPassword(String email) {
+        log.info("Preparing user account for reset password");
+        String token;
+        String result;
+        String response;
+        String sql = "{call authentication_pkg.forgotPassword(?,?,?,?)}";
+        try (Connection con = Connect.dbase();
+             CallableStatement stmt = con.prepareCall(sql)) {
+            stmt.setString(1, email);
+            stmt.registerOutParameter(2, OracleTypes.VARCHAR);
+            stmt.registerOutParameter(3, OracleTypes.VARCHAR);
+            stmt.registerOutParameter(4, OracleTypes.VARCHAR);
+            stmt.execute();
+            token = stmt.getString(2);
+            result = stmt.getString(3);
+            response = stmt.getString(4);
+            log.info("Successfully prepare user account for reset with the following response: {}", response);
+            if(response.equalsIgnoreCase("success")){
+                ForgotEmail.sendMail(result, email, token);
+            }
+            return new ForgotResponseDTO(token,result,response);
+        } catch (SQLException err) {
+            log.error("Error in authentication_pkg (FORGOT PASSWORD)", err);
+            try {
+                Spectre.recordError("TE-20001", "Error in authentication_pkg (FORGOT PASSWORD): " + err.getMessage(), AuthDAO.class.getName());
+                return new ForgotResponseDTO("","","unsuccessful");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static String resetPassword(String verificationToken, String password) {
+        log.info("Preparing to reset user password");
+        String response;
+        String sql = "{call authentication_pkg.resetPassword(?,?,?)}";
+        try (Connection con = Connect.dbase();
+             CallableStatement stmt = con.prepareCall(sql)) {
+            stmt.setString(1, verificationToken);
+            stmt.setString(2, password);
+            stmt.registerOutParameter(3, OracleTypes.VARCHAR);
+            stmt.execute();
+            response = stmt.getString(3);
+            log.info("Successfully reset user password with the following response: {}", response);
+        } catch (SQLException err) {
+            log.error("Error in authentication_pkg (RESET PASSWORD)", err);
+            try {
+                Spectre.recordError("TE-20001", "Error in authentication_pkg (RESET PASSWORD): " + err.getMessage(), AuthDAO.class.getName());
                 response = "internal server error";
             } catch (Exception e) {
                 throw new RuntimeException(e);
