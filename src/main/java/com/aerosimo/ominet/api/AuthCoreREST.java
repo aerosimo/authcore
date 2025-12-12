@@ -127,7 +127,7 @@ public class AuthCoreREST {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response forgot(ForgotRequestDTO req) {
-        log.info("Frgoot Password for account with email: {}", req.getEmail());
+        log.info("Forgot Password for account with email: {}", req.getEmail());
         ForgotResponseDTO result = AuthDAO.forgotPassword(req.getEmail());
         if ("success".equalsIgnoreCase(result.getStatus())) {
             return Response.ok(result).build();
@@ -146,7 +146,7 @@ public class AuthCoreREST {
         log.info("Password reset with this verification: {}", req.getVerificationToken());
         String result = AuthDAO.resetPassword(req.getVerificationToken(),req.getPassword());
         if ("success".equalsIgnoreCase(result)) {
-            return Response.ok(result).build();
+            return Response.ok(new APIResponseDTO(result, "successfully reset password")).build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity(new APIResponseDTO("unsuccessful", "invalid credentials"))
