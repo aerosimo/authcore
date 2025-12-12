@@ -129,7 +129,7 @@ public class AuthCoreREST {
     public Response forgot(ForgotRequestDTO req) {
         log.info("Frgoot Password for account with email: {}", req.getEmail());
         ForgotResponseDTO result = AuthDAO.forgotPassword(req.getEmail());
-        if ("valid".equalsIgnoreCase(result.getStatus())) {
+        if ("success".equalsIgnoreCase(result.getStatus())) {
             return Response.ok(result).build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED)
